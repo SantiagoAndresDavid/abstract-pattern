@@ -1,0 +1,78 @@
+/* payment.component.css */
+.payment-card {
+  width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-field {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-align: center;
+  min-height: 20px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+button[type="submit"] {
+  flex-grow: 1;
+  padding: 8px 16px;
+}
+
+mat-spinner {
+  margin-left: 10px;
+}
+
+/* Fix for overlapping select options */
+::ng-deep .custom-select-panel {
+  min-width: calc(100% + 32px);
+  margin-left: -16px;
+  margin-top: 4px;
+}
+
+::ng-deep .custom-select-panel .mat-mdc-option {
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .mat-mdc-select-panel {
+  padding: 8px 0 !important;
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  height: 22px !important;
+}
+
+/* Improve appearance */
+::ng-deep .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-infix {
+  padding: 14px 0 10px 0;
+}
+
+/* Ensure proper spacing for the overlay panel */
+::ng-deep .cdk-overlay-pane {
+  transform: translateY(0) !important;
+}
+
+/* Make sure dropdown opens with sufficient space */
+::ng-deep .mat-mdc-select-panel-wrap {
+  position: static !important;
+}
+
+/* Force correct positioning for dropdown menu */
+::ng-deep .cdk-overlay-connected-position-bounding-box {
+  position: absolute !important;
+}

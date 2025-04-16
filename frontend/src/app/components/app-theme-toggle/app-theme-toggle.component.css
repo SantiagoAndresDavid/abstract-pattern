@@ -1,0 +1,42 @@
+/* src/styles.css or styles.scss */
+
+:root {
+  /* Default variables that will be overridden by theme */
+  --primary-color: #3f51b5;
+  --secondary-color: #ff4081;
+  --background-color: #ffffff;
+  --surface-color: #f5f5f5;
+  --text-color: #333333;
+  --error-color: #f44336;
+
+  /* Transition for smooth theme switching */
+  --theme-transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: var(--theme-transition);
+}
+
+.mat-app-background {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Theme-specific component styles */
+.light-theme .mat-card,
+.light-theme .mat-drawer {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+}
+
+.dark-theme .mat-card,
+.dark-theme .mat-drawer {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+}
+
+/* Add more component-specific theme styles as needed */

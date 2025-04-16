@@ -1,0 +1,36 @@
+<!-- payment.component.html -->
+<mat-card class="payment-card">
+  <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Tipo de pago*</mat-label>
+      <mat-select formControlName="typePayment" panelClass="custom-select-panel">
+        <mat-option *ngFor="let paymentType of paymentTypes" [value]="paymentType">
+          {{ paymentType }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="paymentForm.get('typePayment')?.hasError('required')">
+        Este campo es requerido
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Monto*</mat-label>
+      <input matInput formControlName="Amount" type="number" min="0.01" step="0.01">
+      <mat-error *ngIf="paymentForm.get('Amount')?.hasError('required')">
+        Este campo es requerido
+      </mat-error>
+      <mat-error *ngIf="paymentForm.get('Amount')?.hasError('min')">
+        El monto debe ser mayor a 0
+      </mat-error>
+    </mat-form-field>
+
+    <div class="error-message" *ngIf="response">{{ response }}</div>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="loading || paymentForm.invalid">
+        {{ loading ? 'Procesando...' : 'Pagar' }}
+      </button>
+      <mat-spinner *ngIf="loading" diameter="30"></mat-spinner>
+    </div>
+  </form>
+</mat-card>
