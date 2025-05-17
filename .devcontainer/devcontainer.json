@@ -1,0 +1,71 @@
+{
+  "name": "Multi-Repo Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/base:debian",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installGradle": true,
+      "installMaven": false
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "19"
+    },
+    "ghcr.io/devcontainers-extra/features/angular-cli:2": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true,
+      "username": "vscode",
+      "userUid": 1000,
+      "userGid": 1000,
+      "nonFreePackages": true,
+      "installTools": [
+        "curl",
+        "wget",
+        "git",
+        "htop",
+        "jq",
+        "nano",
+        "vim",
+        "tree",
+        "unzip",
+        "zip"
+      ]
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest"
+    }
+  },
+"containerEnv": {
+  "REPOS_TO_CLONE": "pattern-microservice abstract-pattern",
+  "ENV_VARS_TO_SET": "API_KEY PROJECT_ID SECRET_KEY"
+},
+  "postCreateCommand": "mkdir -p /workspaces/scripts && mkdir -p /workspaces/.devcontainer && mkdir -p $HOME/.local/bin && touch /workspaces/.repos_config && cat > /workspaces/scripts/setup_repos.sh << 'EOF'\n#!/bin/bash\n\nLOG_FILE=\"/workspaces/.repos_setup_log\"\nENV_VARS_FILE=\"/workspaces/.devcontainer/env_vars.sh\"\n\nlog() {\n  echo \"[$(date '+%Y-%m-%d %H:%M:%S')] $1\" >> \"$LOG_FILE\"\n}\n\nIFS=' ' read -r -a repos <<< \"${REPOS_TO_CLONE:-}\"\nIFS=' ' read -r -a env_vars <<< \"${ENV_VARS_TO_SET:-}\"\n\nclone_repo() {\n  local repo_name=$1\n\n  if [ -d \"/workspaces/$repo_name\" ]; then\n    echo \"✅ Repositorio $repo_name ya existe.\"\n    return 0\n  fi\n\n  echo -n \"🔗 Ingrese la URL para clonar $repo_name: \"\n  read repo_url\n\n  if [ -z \"$repo_url\" ]; then\n    echo \"❌ No se proporcionó URL. Saltando $repo_name.\"\n    return 1\n  fi\n\n  echo \"⏳ Clonando $repo_name desde $repo_url...\"\n  cd /workspaces && git clone \"$repo_url\" \"$repo_name\"\n\n  if [ $? -eq 0 ]; then\n    echo \"✅ Repositorio $repo_name clonado exitosamente.\"\n    return 0\n  else\n    echo \"❌ Error al clonar $repo_name. Inténtelo de nuevo.\"\n    return 1\n  fi\n}\n\nask_env_vars() {\n  echo \"\\n🔐 CONFIGURACIÓN DE VARIABLES DE ENTORNO 🔐\"\n  echo \"==========================================\"\n  touch \"$ENV_VARS_FILE\"\n\n  for var in \"${env_vars[@]}\"; do\n    if [ -z \"${!var}\" ]; then\n      echo -n \"💬 Ingrese el valor para \\\"$var\\\": \"\n      read value\n      echo \"export $var=\\\"$value\\\"\" >> \"$ENV_VARS_FILE\"\n    fi\n  done\n}\n\nmain() {\n  echo \"\\n📦 CONFIGURACIÓN DE REPOSITORIOS 📦\"\n  echo \"=====================================\\n\"\n\n  if [ ${#repos[@]} -eq 0 ]; then\n    echo \"⚠️  No se proporcionaron repositorios en la variable REPOS_TO_CLONE.\"\n    log \"ERROR: No se proporcionaron repositorios.\"\n    return 1\n  fi\n\n  local all_cloned=true\n\n  for repo_name in \"${repos[@]}\"; do\n    clone_repo \"$repo_name\"\n    if [ $? -ne 0 ]; then\n      all_cloned=false\n    fi\n  done\n\n  if [ \"$all_cloned\" = true ]; then\n    echo -e \"\\n🎉 ¡Todos los repositorios han sido configurados correctamente! 🎉\"\n    log \"SUCCESS: Repos configurados correctamente por $(whoami)\"\n    ask_env_vars\n    touch /workspaces/.repos_setup_complete\n    return 0\n  else\n    echo -e \"\\n⚠️  Algunos repositorios no pudieron ser configurados. Ejecute el script nuevamente.\"\n    log \"WARNING: Falló la configuración completa por $(whoami)\"\n    return 1\n  fi\n}\n\nmain\nEOF\n\nchmod +x /workspaces/scripts/setup_repos.sh && ln -sf /workspaces/scripts/setup_repos.sh $HOME/.local/bin/SetUpDevContainer && echo '\n# Mensaje recordatorio para configurar repos y cargar variables\nif [ -f /workspaces/.devcontainer/env_vars.sh ]; then\n  source /workspaces/.devcontainer/env_vars.sh\nfi\n\nif [ ! -f /workspaces/.repos_setup_complete ]; then\n  echo \"\\n💡 Tip: ejecuta \\\"SetUpDevContainer\\\" para configurar tus repositorios y variables de entorno.\\n\"\nfi' >> ~/.zshrc",  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "esbenp.prettier-vscode",
+        "angular.ng-template"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
+    },
+    "codespaces": {
+      "repositories": {
+        "SantiagoAndresDavid/pattern-microservice": {
+          "permissions": {
+            "contents": "write",
+            "pull_request": "write"
+          }
+        },
+        "SantiagoAndresDavid/abstract-pattern": {
+          "permissions": {
+            "contents": "write",
+            "pull_request": "write"
+          }
+        }
+      }
+    }
+  }
+}
